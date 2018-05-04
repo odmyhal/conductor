@@ -89,4 +89,11 @@ public class WordsServiceTest {
         assertEquals(1, myDocuments.size());
         assertTrue(myDocuments.contains("five"));
     }
+
+    @Test
+    public void resetTest(){
+        wordsService.reset();
+        Set<String> myDocuments = wordsService.searchDocument("world");
+        assertTrue(myDocuments.isEmpty());
+    }
 }
