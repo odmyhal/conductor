@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Documents service</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script th:inline="javascript">
+        $(document).ready(function(){
+
+            $("#put-submit").click(function(){
+
+                $.ajax({
+                    type: "PUT",
+                    contentType: 'application/json',
+                    dataType: "json",
+                    url: "/put",
+                    data: JSON.stringify({
+                        key: $("#put-key").val(),
+                        document: $("#put-value").val()
+                    }),
+                    success: function(data, textStatus, jqXHR){
+                        $("#response").html("<h2 style='color:green;'>Saved: " + $("#put-key").val() + " => " + $("#put-value").val() + "</h2>")
+                    },
+                    error: function(jqXHR, textStatus, errorThrown){
+                        $("#response").html("<h2 style='color:red;'>Error: " + textStatus + "</h2>" )
+                    }
+                });
+
+
+            });
+
+            $("#get-submit").click(function(){
+                $.ajax({
+                    type: "GET",
+                    contentType: 'application/json',
+                    dataType: "json",
+                    url: "/get?key=" + $("#get-key").val(),
+                    success: function(data, textStatus, jqXHR){
+                        $("#response").html("<h3 style='color:green;'>" + data.document + "</h3>")
+                    },
+                    error: function(jqXHR, textStatus, errorThrown){
+                        $("#response").html("<h2 style='color:red;'>Error: " + textStatus + "</h2>" )
+                    }
+                })
+            });
+
+            $("#search-submit").click(function(){
+                $.ajax({
+                    type: "POST",
+                    contentType: 'application/json',
+                    dataType: "json",
+                    url: "/search",
+                    data: JSON.stringify({
+                        words: $("#search-value").val()
+                    }),
+                    success: function(data, textStatus, jqXHR){
+                        var txt = "<h3 style='color:green;'>"
+                        for(var i in data){
+                            if(i > 0){
+                                txt += ", ";
+                            }
+                            txt += "<a href='#' go='ll'>" + data[i] + "</a>";
+                        }
+                        txt += "</h3>";
+                        $("#response").html(txt);
+                        $("a[go=ll]").click(function(){
+                            $("#get-key").val($(this).text());
+                            $("#get-submit").click();
+                        });
+                    },
+                    error: function(jqXHR, textStatus, errorThrown){
+                        $("#response").html("<h2 style='color:red;'>Error: " + textStatus + "</h2>" )
+                    }
+                })
+            });
+
+            $("#submit-reset").click(function(){
+                $.ajax({
+                    type: "DELETE",
+                    contentType: 'application/json',
+                    dataType: "json",
+                    url: "/reset",
+                    success: function(data, textStatus, jqXHR){
+                        $("#response").html("<h2 style='color:green;'>All documents are deleted</h2>")
+                    },
+                    error: function(jqXHR, textStatus, errorThrown){
+                        $("#response").html("<h2 style='color:red;'>Error: " + textStatus + "</h2>" )
+                    }
+                })
+            });
+        })
+    </script>
+</head>
+<body>
+    <h3>Documents service</h3>
+    <h4>For tests purpose, press <input type="button" id="submit-reset" value="reset"/>, in order to delete already existing documents</h4>
+    <hr/>
+    <table cellpadding="15" border="5">
+        <tbody>
+            <tr>
+                <td valign="top">
+                    <h3>put document</h3>
+                    key: <input type="text" size="20" id="put-key"/><br/><br/>
+                    document: <textarea cols="30" rows="4" id="put-value"></textarea><br/><br/>
+                    <input type="button" value="put" id="put-submit"/>
+                    <br/><br/>
+                    <b style='color:red;'>Please, use " " (whitespace) as word delimiter</b>
+                </td>
+                <td valign="top">
+                    <h3>get document</h3>
+                    key: <input type="text" size="20" id="get-key"/><br/><br/>
+                    <input type="button" value="get" id="get-submit"/>
+                </td>
+                <td valign="top">
+                    <h3>search document</h3>
+                    words: <textarea cols="30" rows="4" id="search-value"></textarea><br/><br/>
+                    <input type="button" value="search" id="search-submit"/>
+                    <br/><br/>
+                    <b style='color:red;'>Please, use " " (whitespace) as word delimiter</b>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <div id="response"></div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
